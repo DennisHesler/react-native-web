@@ -742,18 +742,32 @@ class VirtualizedList extends StateSafePureComponent<Props, State> {
     this.teardownWebWheelHandler();
   }
 
+     // REACT-NATIVE-WEB patch to preserve during future RN merges: Support inverted wheel scroller.
+     setupWebWheelHandler() {
+      if (this._scrollRef && this._scrollRef.getScrollableNode && this._scrollRef.inverted) {
+        this._scrollRef.getScrollableNode().addEventListener('wheel',
+            this.invertedWheelEventHandler,
+        );
+      } else {
+        setTimeout(() => this.setupWebWheelHandler(), 50);
+        return
+      }
+    }
+
   // REACT-NATIVE-WEB patch to preserve during future RN merges: Support inverted wheel scroller.
   setupWebWheelHandler() {
     if (this._scrollRef && this._scrollRef.getScrollableNode) {
       this._scrollRef.getScrollableNode().addEventListener('wheel',
           this.invertedWheelEventHandler,
-          { passive: false },
+          { passive: true },
       );
     } else {
       setTimeout(() => this.setupWebWheelHandler(), 50);
       return
     }
   }
+
+ 
 
   // REACT-NATIVE-WEB patch to preserve during future RN merges: Support inverted wheel scroller.
   teardownWebWheelHandler() {
